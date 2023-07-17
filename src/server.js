@@ -12,6 +12,8 @@ const songs = require("./api/songs")
 const SongsService = require("./services/postgres/SongsService")
 const SongsValidator = require("./validator/songs")
 
+const ClientError = require("./exceptions/ClientError")
+
 const init = async () => {
 	const server = Hapi.server({
 		port: process.env.PORT,
@@ -42,6 +44,28 @@ const init = async () => {
 			}
 		}
 	])
+	server.ext("onPreResponse", (request, h) => {
+		const { response } = request
+
+		if(response instanceof ClientError) {
+			//user defined
+			return h.response({
+				status: "fail",
+				message: response.message
+			}).code(response.statusCode)
+			//other client errors
+			if(!response.isServer) return h.continue
+
+			//server errors
+			return h.response({
+				status: "error",
+				message: "Maaf, terjadi kesalahan pada server"
+			}).code(500)
+		}
+
+		//default
+		return h.continue
+	})
 
 	await server.start()
 	console.log(`Listening on http://${process.env.HOST}:${process.env.PORT} ...`)
