@@ -32,7 +32,8 @@ const init = async () => {
 		{
 			plugin: albums,
 			options: {
-				service: albumsService,
+				albumsService,
+				songsService,
 				validator: AlbumsValidator
 			}
 		},
@@ -47,16 +48,19 @@ const init = async () => {
 	server.ext("onPreResponse", (request, h) => {
 		const { response } = request
 
-		if(response instanceof ClientError) {
-			//user defined
-			return h.response({
-				status: "fail",
-				message: response.message
-			}).code(response.statusCode)
+		if(response instanceof Error) {
+			if(response instanceof ClientError) {	
+				//user defined
+				return h.response({
+					status: "fail",
+					message: response.message
+				}).code(response.statusCode)
+			}
 			//other client errors
 			if(!response.isServer) return h.continue
 
 			//server errors
+			console.log(response.message)
 			return h.response({
 				status: "error",
 				message: "Maaf, terjadi kesalahan pada server"

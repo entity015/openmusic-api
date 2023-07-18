@@ -33,7 +33,16 @@ class SongsService {
 		const result = await this._pool.query(query)
 		if(!result.rows.length) throw new NotFoundError("Id lagu tidak ditemukan")
 
-		return result.rows.map(DBToModel)[0]
+		return DBToModel(result.rows[0])
+	}
+	async getSongsByAlbumId(albumId) {
+		const query = {
+			text: "SELECT * FROM songs WHERE album_id = $1",
+			values: [albumId]
+		}
+		const result = await this._pool.query(query)
+
+		return result.rows.map(({ id, title, performer }) => {{ id, title, performer }})
 	}
 	async editSong({ title, year, genre, performer, duration, albumId }, id) {
 		const query = {
