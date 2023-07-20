@@ -44,6 +44,18 @@ class SongsService {
 
 		return result.rows.map(({ id, title, performer }) => {{ id, title, performer }})
 	}
+	async getSongsByPlaylistId(playlistId) {
+		const query = {
+			text: `SELECT songs.*
+			FROM songs INNER JOIN playlist_songs
+			ON playlist_songs.song_id=songs.id
+			WHERE playlist_songs.playlist_id=$1`,
+			values: [playlistId]
+		}
+		const result = await this._pool.query(query)
+
+		return result.rows.map(({ id, title, performer }) => ({ id, title, performer }))
+	}
 	async editSong({ title, year, genre, performer, duration, albumId }, id) {
 		const query = {
 			text: "UPDATE songs SET title = $1, year = $2, genre = $3, performer = $4, duration = $5, album_id = $6 WHERE id = $7 RETURNING id",
