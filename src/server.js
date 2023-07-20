@@ -23,6 +23,8 @@ const playlists = require("./api/playlists")
 const PlaylistsService = require("./services/postgres/PlaylistsService")
 const PlaylistsValidator = require("./validator/playlists")
 
+const ActivitiesService = require("./services/postgres/ActivitiesService")
+
 //authentications
 const authentications = require("./api/authentications")
 const AuthenticationsService = require("./services/postgres/AuthenticationsService")
@@ -51,7 +53,8 @@ const init = async () => {
 	const songsService = new SongsService()
 	const usersService = new UsersService()
 	const collaborationsService = new CollaborationsService(usersService)
-	const playlistsService = new PlaylistsService(songsService, collaborationsService) 
+	const activitiesService = new ActivitiesService()
+	const playlistsService = new PlaylistsService(songsService, collaborationsService, usersService, activitiesService) 
 	const authenticationsService = new AuthenticationsService()
 
 	await server.register({
@@ -108,6 +111,8 @@ const init = async () => {
 			options: {
 				playlistsService,
 				songsService,
+				usersService,
+				activitiesService,
 				validator: PlaylistsValidator
 			}
 		},

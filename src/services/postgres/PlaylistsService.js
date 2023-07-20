@@ -4,10 +4,11 @@ const NotFoundError = require("../../exceptions/NotFoundError")
 const AuthorizationError = require("../../exceptions/AuthorizationError")
 
 class PlaylistsService {
-	constructor(songService, collaborationService) {
+	constructor(songService, collaborationService, activityService) {
 		this._pool = new Pool()
 		this._songService = songService
 		this._collaborationService = collaborationService
+		this._activityService = activityService
 	}
 
 	async addPlaylist({ name, owner }) {
@@ -60,6 +61,7 @@ class PlaylistsService {
 			values: [playlistId]
 		}
 		const result = await this._pool.query(query)
+		if(!result.rows.length) throw new NotFoundError("Playlist tidak ditemukan")
 
 		return result.rows[0]
 	}
@@ -89,6 +91,17 @@ class PlaylistsService {
 			values: [playlistId,songId]
 		}
 		await this._pool.query(query)
+	}
+
+	async getPlaylistActivities(playlistId) {
+		//check if playlist exist
+		await this.getPlaylistById(playlistId)
+		const query = {
+			text: "SELECT * FROM activities WHERE id=$1",
+			values: [playlistId]
+		}
+		const result = await this._pool.query(query)
+		return result.rows
 	}
 }
 

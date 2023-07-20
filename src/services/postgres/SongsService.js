@@ -42,7 +42,7 @@ class SongsService {
 		}
 		const result = await this._pool.query(query)
 
-		return result.rows.map(({ id, title, performer }) => {{ id, title, performer }})
+		return result.rows.map(({ id, title, performer }) => ({ id, title, performer }))
 	}
 	async getSongsByPlaylistId(playlistId) {
 		const query = {
