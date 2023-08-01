@@ -16,5 +16,17 @@ const DBToModel = ({
 	albumId
 })
 
+const DBtoAlbumModel = ({
+	id,
+	name,
+	year,
+	cover_url: coverUrl
+}) => ({
+	id,
+	name,
+	year,
+	coverUrl
+})
 
-module.exports = { DBToModel }
+
+module.exports = { DBToModel, DBtoAlbumModel }

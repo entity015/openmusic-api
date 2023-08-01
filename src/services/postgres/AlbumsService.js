@@ -1,5 +1,6 @@
 const { nanoid } = require("nanoid")
 const { Pool } = require("pg")
+const { DBtoAlbumModel } = require("../../utils")
 const InvariantError = require("../../exceptions/InvariantError")
 const NotFoundError = require("../../exceptions/NotFoundError")
 
@@ -27,7 +28,7 @@ class AlbumsService {
 		const result = await this._pool.query(query)
 		if(!result.rows.length) throw new NotFoundError("Id album tidak ditemukan")
 
-		return result.rows[0]
+		return DBtoAlbumModel(result.rows[0])
 	}
 	async editAlbum({ name, year }, id) {
 		const query = {
@@ -44,6 +45,13 @@ class AlbumsService {
 		}
 		const result = await this._pool.query(query)
 		if(!result.rows.length) throw new NotFoundError("Hapus album gagal. Id album tidak ditemukan")
+	}
+	async addCoverUrlByAlbumId(coverUrl, id) {
+		const query = {
+			text: "UPDATE albums SET cover_url = $1 WHERE id = $2",
+			values: [coverUrl,id]
+		}
+		await this._pool.query(query)
 	}
 }
 
